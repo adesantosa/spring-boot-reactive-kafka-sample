@@ -1,0 +1,45 @@
+logging:
+  level:
+    org.springframework.data.r2dbc: DEBUG
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    stream:
+      function:
+        definition: orderConsumer;orderProducer
+        bindings:
+          orderConsumer-in-0: 'order-consumer-test'
+          orderProducer-out-0: 'order-producer-test'
+#      binders:
+#        kafka:
+#          type: 'kafka'
+      bindings:
+        order-consumer-test:
+          group: ${spring.application.name}-4
+#          binder: 'kafka'
+          destination: 'reactive-topic'
+          consumer:
+            max-attempts: 5
+            back-off-max-interval: 30000
+            partitioned: true
+            concurrency: 8
+        order-producer-test:
+#          binder: 'kafka'
+          destination: 'reactive-topic'
+      kafka:
+        binder:
+         brokers: 'localhost:9092'
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: sa
+    pool:
+      initial-size: 100
+      max-size: 500
+      max-idle-time: 30m
+      validation-query: SELECT 1
+
+
+
